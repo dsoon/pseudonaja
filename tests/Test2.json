@@ -1,0 +1,34 @@
+{
+    "name" : "Test2",
+
+    "code" : [ 
+        "declare a : integer",
+        "declare b : integer",
+        "output \"input one number\"",
+        "input a",
+        "output \"input another number\"",
+        "input b",
+        "if a > b then",
+        "    output a, \"is greater than\", b",
+        "else",
+        "    if a < b then",
+        "        output a, \"is less than\", b",
+        "    else",
+        "        if a = b then",
+        "            output a, \"is equal to\", b",
+        "        endif",
+        "    endif",
+        "endif"
+    ],
+
+    "inputs" : [ 
+        "100",
+        "50"
+    ],
+
+    "outputs" : [
+        "input one number \n", 
+        "input another number \n", 
+        "100 is greater than 50 \n"
+    ] 
+}

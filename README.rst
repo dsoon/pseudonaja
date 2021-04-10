@@ -31,6 +31,11 @@ Features
 Credits
 -------
 
+Lexer and Parser - Sly_
+
+.. _Sly: https://github.com/dabeaz/sly
+
+
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter

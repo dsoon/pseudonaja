@@ -1,0 +1,24 @@
+{
+    "name" : "Test1",
+
+    "code" : [ 
+        "declare name : string",
+        "declare age: integer",
+        "output \"What is you name?\"",
+        "input name",
+        "output \"How old are you?\"",
+        "input age",
+        "output name, \"you are\", age, \"years old\""
+    ],
+
+    "inputs" : [ 
+        "David",
+        "21"
+    ],
+
+    "outputs" : [
+        "What is you name? \n", 
+        "How old are you? \n", 
+        "David you are 21 years old \n"
+    ] 
+}

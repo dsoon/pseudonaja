@@ -1,0 +1,23 @@
+{
+    "name" : "Test3 - functions",
+
+    "code" : [ 
+        "function sum (a : integer, b : integer ) returns integer",
+        "    return a + b",
+        "endfunction",
+        "declare a : integer",
+        "declare b : integer",
+        "input a",
+        "input b",
+        "output \"The sum of\", a,\"and\", b, \"is\", sum(a, b)"
+    ],
+
+    "inputs" : [ 
+        "99",
+        "1"
+    ],
+
+    "outputs" : [
+        "The sum of 99 and 1 is 100 \n"
+    ] 
+}

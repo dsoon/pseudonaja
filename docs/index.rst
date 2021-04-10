@@ -8,7 +8,7 @@ Welcome to pseudonaja's documentation!
    readme
    installation
    usage
-   modules
+   languages
    contributing
    authors
    history
