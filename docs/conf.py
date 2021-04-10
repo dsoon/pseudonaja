@@ -90,12 +90,13 @@ html_theme = 'sphinx_rtd_theme'
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
+html_logo = "brown_snake.png"
 
 html_theme_options = {
     'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
     'analytics_anonymize_ip': False,
-    'logo_only': False,
-    'display_version': True,
+    'logo_only': True,
+    'display_version': False,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     'vcs_pageview_mode': '',
