@@ -1,4 +1,9 @@
-import Pseudonaja.c.PInterpreter as pscint
+import sys, os
+
+sys.path += ['pseudonaja']
+print(os.getcwd())
+
+import pseudonaja.c.PInterpreter as pscint
 import json
 
 class RunTest:
@@ -30,13 +35,13 @@ class RunTest:
             return "".join(self.lines)
 
         def compare(self, name, outputs, screen):
-            
+
             outputs = "".join(outputs)
             '''
             def dump(a, e):
                 for i, c in enumerate(a):
                     print(f"{i} a={c} e={outputs[i] if i < len(outputs) else None}")
-            
+
             dump(''.join(self.lines), outputs)
             '''
             assert ''.join(self.lines) == outputs, f"Test failed ({name})\n\nTest output\n{screen}\n\nExpected output\n{outputs}"
@@ -64,3 +69,8 @@ class RunTest:
         sys.stdout = stdout_save
 
         s.compare(test['name'], test['outputs'], s)
+
+
+#print("DEBUG", os.getcwd())
+if __name__ == "__main__":
+    RunTest("pseudonaja/tests/Test4")

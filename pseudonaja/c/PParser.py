@@ -126,9 +126,9 @@ class PParser(Parser):
     def statement(self, p):
         return selection.IfThenElse(p[1], p[3], p[5], p.lineno)
 
-    @_('CASE expression caselist ENDCASE')
+    @_('CASE OF expression caselist ENDCASE')
     def statement(self, p):
-        return selection.Case(p[1], p[2], p.lineno)
+        return selection.Case(p[2], p[3], p.lineno)
 
     @_('a_case')
     def caselist(self, p):
