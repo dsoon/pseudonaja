@@ -66,6 +66,9 @@ class Array(Variable):
 
         #print(f"Array __getitem_ called with index {idx}")
 
+        if isinstance(idx, Variable):
+            idx = idx.value
+
         if idx < self.__s_idx or idx > self.__e_idx:
             raise IndexError(f"Index out of range {self.name} [{idx}]")
 
@@ -75,7 +78,14 @@ class Array(Variable):
 
     def __setitem__(self, idx, value):
 
+        #print(f"type of idx = {type(idx)}")
         #print(f"Array __setitem_ called with index {idx} and value {value}")
+
+        if isinstance(idx, Variable):
+            idx = idx.value
+
+        if isinstance(value, Variable):
+            value = value.value
 
         if idx < self.__s_idx or idx > self.__e_idx:
             raise IndexError(f"Index out of range {self.name} [{idx}]")
@@ -152,15 +162,16 @@ class SymbolTable:
 
     def __getitem__(self, symbol):
         #print(f"call to __getitem__ with {symbol}")
+        try:
+            if symbol not in self.__table: # Global symbol table
 
-        if symbol not in self.__table:
-            raise SyntaxError(f"Syntax error: symbol '{symbol}' undefined")
-
-        # Is there a call stack?
-        if len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack, list):
-            return pcint.PInterpreter.stack[-1][symbol]
-
-        return self.__table [symbol]
+                # Is there a call stack?
+                if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):
+                    return pcint.PInterpreter.stack[-1][symbol]
+            else:
+                return self.__table [symbol]
+        except KeyError as e:
+            raise SyntaxError(f"Symbol undefined {e}")
 
     def __iter__(self):
         self.keys = list(self.__table.keys())

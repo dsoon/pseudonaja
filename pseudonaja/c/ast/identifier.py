@@ -23,8 +23,13 @@ class Assign(node.Node):
             raise SyntaxError(f"Symbol '{self.__var.name}' undefined on line {self.lineno}")
 
         if isinstance(self.__var, ArrayIdentifier):
+
             name = self.__var.name
             idx  = self.__var.idx
+
+            assert name and idx, f"Assertion failed: Array assignment error: {name}[{idx}]" 
+
+            #print(f"Got array idenifier: name={name} index={idx}")
             pcint.PInterpreter.symbols[name][idx] = self.__expr.interpret()
 
         elif   isinstance(self.__var, Identifier):
@@ -53,7 +58,6 @@ class Declare(node.Node):
         return self.__str__()
 
 
-
 class Identifier(node.Node):
 
     def __init__(self, name, lineno):
@@ -73,7 +77,22 @@ class Identifier(node.Node):
         return self.interpret()
 
     def interpret(self):
-        return pcint.PInterpreter.symbols[ self.name ].value
+ 
+        # check if identifier in the global symbol table
+        if self.name not in pcint.PInterpreter.symbols:
+
+            # check if there is a stack frame, if so check if name is in the stack frame
+            if len(pcint.PInterpreter.stack) == 0 or isinstance(pcint.PInterpreter.stack[-1], dict) and self.name not in pcint.PInterpreter.stack[-1]: 
+
+                raise SyntaxError(f"Identifier '{self.name}' is undefined")
+
+            else: # found identifier in stack frame
+                value = pcint.PInterpreter.stack[-1][self.name]
+
+        else:
+            value = pcint.PInterpreter.symbols[ self.name ].value
+
+        return value
 
 
 class ArrayIdentifier(Identifier):
@@ -85,8 +104,10 @@ class ArrayIdentifier(Identifier):
     @property
     def name(self):
         return super().name
+
     @property
     def idx(self):
+        #print(f"DEBUG: ArrayIdentifier - idx property {type(self.__expr)}")
         return self.__expr.interpret()
 
     def interpret(self):

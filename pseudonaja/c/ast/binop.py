@@ -1,6 +1,7 @@
 from . import node
 from . import identifier
 import pseudonaja.c.PParser as PParser
+from pseudonaja.c.PSymbolTable import Variable
 
 class BinOp(node.Node):
 
@@ -23,6 +24,12 @@ class BinOp(node.Node):
 
         n1 = self.__left.interpret()
         n2 = self.__right.interpret()
+
+        if isinstance(n1, Variable):
+            n1 = n1.value
+
+        if isinstance(n2, Variable):
+            n2 = n2.value
 
         if   self.__op == '>':
             return n1 > n2

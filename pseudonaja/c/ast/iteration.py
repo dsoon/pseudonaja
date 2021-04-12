@@ -37,17 +37,20 @@ class For(node.Node):
     self.__statements = statements
 
   def interpret(self):
-    stack_frame ={}
+
+    stack_frame = {}
+
     stack_frame[self.__identifier] = Variable(self.__identifier, "INTEGER")
 
     # Push stack frame
     pcint.PInterpreter.stack.append(stack_frame)
 
     step = 1 if self.__step == None else self.__step.interpret()
-    for i in range(self.__start.interpret(), self.__end.interpret(), step):
+    for i in range(self.__start.interpret(), self.__end.interpret()+1, step):
 
         stack_frame[self.__identifier].value = i
-
+        
+        #print(f"DEBUG: For.interpret() {stack_frame[self.__identifier].value} = {i} ")
         # Run the procedure
         self.__statements.interpret()
 

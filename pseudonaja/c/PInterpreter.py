@@ -52,10 +52,12 @@ class PInterpreter:
             tokens = self.lexer.tokenize(program)
             self.parser.parse(tokens)
             self.parser.root.interpret()
-        except UnableToContinue as e:
-            print(f"{e}")
 
         except SyntaxError as e:
+            print(f"\nSyntax Error: {e}")
+
+        '''
+        except UnableToContinue as e:
             print(f"{e}")
 
         except TypeError as e:
@@ -66,3 +68,4 @@ class PInterpreter:
 
         except AssertionError as e:
             print(f"{e}")
+        '''

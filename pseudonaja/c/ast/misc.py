@@ -27,7 +27,7 @@ def type_cast(var_type, value):
             val = value[0]
 
         elif var_type == "BOOLEAN":
-            val = eval("{value.title()}")
+            val = value
 
         elif var_type == "STRING":
             val = str(value)

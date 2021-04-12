@@ -102,7 +102,7 @@ class PParser(Parser):
         return procedure.CallProcedure(p[1], p[3], p.lineno)
 
     # Declaring a procedure w/o arguments
-    @_('CALL IDENTIFIER "(" ")"')
+    @_('CALL IDENTIFIER')
     def statement(self, p):
         return procedure.CallProcedure(p[1], None, p.lineno)
 

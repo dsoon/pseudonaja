@@ -13,20 +13,33 @@ class CallFunction(node.Node):
         stack_frame = {}
 
         # Internal functions don't need to be declared.
-        if self.__name.lower() in ["div", "random", "mod"]:
+        if self.__name.lower() in ["div", "mod", "random", "len"]:
             
-            arg1 = self.__arglist.args[0].value
-            arg2 = self.__arglist.args[1].value
+            arg1 = arg2 = None
+
+            if self.__arglist and len(self.__arglist.args) > 0:
+                arg1 = self.__arglist.args[0].value
+                if len(self.__arglist.args) > 1:
+                    arg2 = self.__arglist.args[1].value
 
             if self.__name.lower() == "div":
                 return arg1 // arg2
+
+            elif self.__name.lower() == "mod":
+                return arg1 % arg2 
 
             elif self.__name.lower() == "random":
                 from random import randint
                 return randint(arg1, arg2) 
 
-            else: # default Mod command
-                return arg1 % arg2
+            else: # default array len command
+                
+                array_name = self.__arglist.args[0].name 
+                try:
+                    array_var = pcint.PInterpreter.symbols[array_name]
+                except KeyError:
+                    raise SyntaxError(f"Array name '{array_name}' undefined while calling len()")
+                return array_var.end_index - array_var.start_index + 1
                 
         else: # User defined functions
 
