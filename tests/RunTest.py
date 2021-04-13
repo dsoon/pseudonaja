@@ -22,8 +22,6 @@ class RunTest:
             self.lines = []
 
         def write(self, line):
-            #if line[-1] == '\n':
-            #    line = line[:-1]
             self.lines.append(line)
 
         def flush(self):
@@ -70,7 +68,5 @@ class RunTest:
 
         s.compare(test['name'], test['outputs'], s)
 
-
-#print("DEBUG", os.getcwd())
 if __name__ == "__main__":
     RunTest("pseudonaja/tests/Test4")

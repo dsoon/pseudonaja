@@ -1,4 +1,5 @@
 from . import node
+import pseudonaja.debug as debug
 
 class IfThen(node.Node):
 
@@ -8,7 +9,10 @@ class IfThen(node.Node):
     self.__statements = statements
 
   def interpret(self):
-    if self.__condition.interpret():
+
+    condition = self.__condition.interpret()
+
+    if condition == True:
         self.__statements.interpret()
 
 class IfThenElse(node.Node):

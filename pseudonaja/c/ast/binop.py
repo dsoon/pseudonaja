@@ -3,11 +3,12 @@ from . import identifier
 import pseudonaja.c.PParser as PParser
 from pseudonaja.c.PSymbolTable import Variable
 
+import pseudonaja.debug as debug
+
 class BinOp(node.Node):
 
     def __init__(self, left, op, right, lineno):
 
-        #print("BinOp().__init__() : Got here")
         super().__init__(lineno)
         self.__left = left
         self.__op = PParser.PParser.bin_op[op.upper()]

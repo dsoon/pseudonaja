@@ -6,8 +6,6 @@ class Input(node.Node):
 
     def __init__(self, identifier, lineno):
 
-        #print(f"Debug: Output.__init__ {args}")
-
         super().__init__(lineno)
         self.__identifier = identifier
 
@@ -27,21 +25,17 @@ class Input(node.Node):
             # Set variable's value to the value returned from input
             var.value = val
         else:
-            print(f"Error: symbol '{self.__identifier}' undefined on line {self.lineno}")
+            raise SyntaxError(f"Error: symbol '{self.__identifier}' undefined on line {self.lineno}")
 
 class Output(node.Node):
 
     def __init__(self, args, lineno):
-
-        #print(f"Debug: Output.__init__ {args}")
 
         super().__init__(lineno)
 
         self.__args = args
 
     def interpret(self):
-
-        #print(f"Debug: Output.interpret {self.__args}")
 
         for arg in self.__args:
             print(arg.interpret(), end=" ")

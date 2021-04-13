@@ -8,9 +8,14 @@ class QueryCommand(node.Node):
 
   def interpret(self):
     if self.__command == "symboltable":
-        print("Dumping symbol table");
+        print("Symbol table dump");
         for n, v in pcint.PInterpreter.symbols.items():
             print(f"name='{n}', value='{v}'")
+
+    elif self.__command == "stack":
+        print("Stack dumnp")
+        for i, v in enumerate(pcint.PInterpreter.stack):
+            print(f"stack[{i}]={v}")
 
 def type_cast(var_type, value):
 
@@ -62,7 +67,6 @@ class ArgList(node.Node):
             self.__args += [arg2]
 
     def __iadd__(self, arg):
-        #print("Debug: __iadd__ called")
         self.__args = arg.args + self.__args
         return self
 

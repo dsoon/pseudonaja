@@ -50,7 +50,6 @@ class For(node.Node):
 
         stack_frame[self.__identifier].value = i
         
-        #print(f"DEBUG: For.interpret() {stack_frame[self.__identifier].value} = {i} ")
         # Run the procedure
         self.__statements.interpret()
 

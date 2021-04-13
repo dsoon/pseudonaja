@@ -3,6 +3,7 @@ from . import misc
 import pseudonaja.c.PInterpreter as pcint
 from pseudonaja.c.PSymbolTable import Variable, Array
 
+import pseudonaja.debug as debug
 
 class Assign(node.Node):
     '''
@@ -16,11 +17,18 @@ class Assign(node.Node):
 
     def interpret(self):
 
-        #print("Debug: Assign.interpret()", self.__var)
-
+        onstack = False
         if self.__var.name not in pcint.PInterpreter.symbols:
-            #print(pcint.PInterpreter.symbols.table)
-            raise SyntaxError(f"Symbol '{self.__var.name}' undefined on line {self.lineno}")
+
+            # check if there is a stackframe
+            if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack, dict):
+
+                if self.__var.name not in pcint.PInterpreter.stack[-1]:
+
+                    raise SyntaxError(f"Symbol '{self.__var.name}' undefined on line {self.lineno}")
+
+                else:
+                    onstack = True
 
         if isinstance(self.__var, ArrayIdentifier):
 
@@ -29,14 +37,20 @@ class Assign(node.Node):
 
             assert name and idx, f"Assertion failed: Array assignment error: {name}[{idx}]" 
 
-            #print(f"Got array idenifier: name={name} index={idx}")
-            pcint.PInterpreter.symbols[name][idx] = self.__expr.interpret()
+            if not onstack:
+                pcint.PInterpreter.symbols[name][idx] = self.__expr.interpret()
+            else:
+                pcint.PInterpreter.stack[-1][name][idx] = self.__expr.interpret()
 
         elif   isinstance(self.__var, Identifier):
             value = self.__expr.interpret()
-            var_type = pcint.PInterpreter.symbols[self.__var.name].type
- 
-            pcint.PInterpreter.symbols[self.__var.name].value = misc.type_cast(var_type, value)
+
+            if not onstack:
+                var_type = pcint.PInterpreter.symbols[self.__var.name].type
+                pcint.PInterpreter.symbols[self.__var.name].value = misc.type_cast(var_type, value)
+            else:
+                var_type = pcint.PInterpreter.stack[-1][self.__var.name].type
+                pcint.PInterpreter.stack[-1][self.__var.name].value = misc.type_cast(var_type, value)
         else:
             raise SyntaxError(f"Assign.interpret: ID type undefined {self.__var}")
 
@@ -74,7 +88,10 @@ class Identifier(node.Node):
 
     @property
     def value(self):
-        return self.interpret()
+        val = self.interpret()
+        if isinstance(val, Variable):
+            val = val.value
+        return val
 
     def interpret(self):
  
@@ -107,7 +124,6 @@ class ArrayIdentifier(Identifier):
 
     @property
     def idx(self):
-        #print(f"DEBUG: ArrayIdentifier - idx property {type(self.__expr)}")
         return self.__expr.interpret()
 
     def interpret(self):
@@ -135,7 +151,14 @@ class IdentifierDecl(node.Node):
         return self.__type
 
     def interpret(self):
-        pcint.PInterpreter.symbols[self.__name] = Variable(self.__name, self.__type)
+        # check if there is a stack frame (declaration called within a blockstatement)
+        if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):
+
+            # found a stack frame, add variable to stack frame
+            pcint.PInterpreter.stack[-1][self.__name] = Variable(self.__name, self.__type) 
+
+        else: # Add to global symbol table
+            pcint.PInterpreter.symbols[self.__name] = Variable(self.__name, self.__type)
 
 class ArrayIdentifierDecl(IdentifierDecl):
 
@@ -147,4 +170,16 @@ class ArrayIdentifierDecl(IdentifierDecl):
     def interpret(self):
 
         __name, __type  = self.name, self.type
-        pcint.PInterpreter.symbols[__name] = Array(__name, __type, self.__start_idx, self.__end_idx)
+
+        # check if there is a stack frame (declaration called within a blockstatement)
+        if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):
+            # found a stack frame, add variable to stack frame
+            pcint.PInterpreter.stack[-1][__name] = Array(__name, __type, self.__start_idx, self.__end_idx)
+ 
+        else: # Add to global symbol table
+            pcint.PInterpreter.symbols[__name] = Array(__name, __type, self.__start_idx, self.__end_idx)
+
+
+
+
+        

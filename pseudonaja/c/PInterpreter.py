@@ -2,6 +2,8 @@ from pseudonaja.c.PLexer  import PLexer
 from pseudonaja.c.PParser import PParser
 from pseudonaja.c.PSymbolTable import SymbolTable
 
+import pseudonaja.debug as debug
+
 class UnableToContinue(Exception):
     def __init__(self, *args):
         self.__message = args[[0]]
@@ -15,11 +17,13 @@ class PInterpreter:
     stack   = []
 
     def __init__(self):
+
         self.lexer = PLexer()
         self.parser = PParser()
 
 
     def repl(self):
+
         prog = []
         finished = False
         while not finished:
@@ -37,8 +41,10 @@ class PInterpreter:
                                 print(f"Error while running code {e}")
                         else:
                             print("There is nothing to run")
+
                     elif line == '.quit':
                         finished = True
+
                     elif line == '.list':
                         for l in prog:
                             print(l)

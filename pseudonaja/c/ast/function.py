@@ -1,7 +1,23 @@
 from . import node
 from pseudonaja.c.PSymbolTable import Function, Variable
 import pseudonaja.c.PInterpreter as pcint
+import pseudonaja.debug as debug
 
+
+# Function declaration with arguments 
+class FunctionDecl(node.Node):
+
+  def __init__(self, name, params, type, statements, lineno):
+    super().__init__(lineno)
+    self.__name  = name
+    self.__params  = params
+    self.__type  = type
+    self.__statements = statements
+
+  def interpret(self):
+    pcint.PInterpreter.symbols[self.__name] = Function(self.__name, self.__type, self.__params, self.__statements)
+
+# Function call
 class CallFunction(node.Node):
 
     def __init__(self, name, arglist, lineno):
@@ -10,6 +26,8 @@ class CallFunction(node.Node):
         self.__arglist = arglist
       
     def interpret(self):
+
+        # Create a stackframe and initialise it with the return variable
         stack_frame = {}
 
         # Internal functions don't need to be declared.
@@ -21,6 +39,12 @@ class CallFunction(node.Node):
                 arg1 = self.__arglist.args[0].value
                 if len(self.__arglist.args) > 1:
                     arg2 = self.__arglist.args[1].value
+
+            if isinstance(arg1, Variable):
+                arg1 = arg1.value
+
+            if isinstance(arg2, Variable):
+                arg2 = arg2.value
 
             if self.__name.lower() == "div":
                 return arg1 // arg2
@@ -53,20 +77,22 @@ class CallFunction(node.Node):
                     param = func.params[idx]
                     stack_frame[param.name] = Variable(param.name, param.type, arg.interpret())
                     idx +=1
-                
-                # Push stack frame
-                pcint.PInterpreter.stack.append(stack_frame)
 
-                # Run the procedure
-                ret_value = func.statements.interpret()
+            # Push stack frame
+            pcint.PInterpreter.stack.append(stack_frame)
 
-                # Remove stack frame after procedure is complete
-                pcint.PInterpreter.stack.pop() 
-                return ret_value
-                
-            else: # Function with no arguments
-                ret_value = func.statements.interpret()
-                return ret_value
+            # Run the function
+            func.statements.interpret()
+
+            debug.dprint(f"CallFunction {self.__name} stack after execution {pcint.PInterpreter.stack}")
+
+            # Pop off the stack frame and extract the return value
+            stack_frame = pcint.PInterpreter.stack.pop()
+
+            ret_value = stack_frame["__return__"]
+
+
+            return ret_value
 
 class Return(node.Node):
 
@@ -77,15 +103,8 @@ class Return(node.Node):
     def interpret(self):
         return self.__expr.interpret()
 
-# Function declaration with arguments 
-class FunctionDecl(node.Node):
+    def __str__(self):
+        return f"Return.__str__, Return self.__expr = {self.__expr}"
 
-  def __init__(self, name, params, type, statements, lineno):
-    super().__init__(lineno)
-    self.__name  = name
-    self.__params  = params
-    self.__type  = type
-    self.__statements = statements
-
-  def interpret(self):
-    pcint.PInterpreter.symbols[self.__name] = Function(self.__name, self.__type, self.__params, self.__statements)
+    def __repl__(self):
+        return self.__str__()

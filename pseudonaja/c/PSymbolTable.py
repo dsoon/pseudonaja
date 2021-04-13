@@ -1,3 +1,5 @@
+import pseudonaja.debug as debug
+
 class Symbol:
     def __init__(self, name):
         self.__name = name
@@ -161,15 +163,16 @@ class SymbolTable:
         self.__table [idx] = val
 
     def __getitem__(self, symbol):
-        #print(f"call to __getitem__ with {symbol}")
         try:
             if symbol not in self.__table: # Global symbol table
 
                 # Is there a call stack?
-                if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):
+                if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):      
                     return pcint.PInterpreter.stack[-1][symbol]
+
             else:
                 return self.__table [symbol]
+
         except KeyError as e:
             raise SyntaxError(f"Symbol undefined {e}")
 
@@ -179,11 +182,9 @@ class SymbolTable:
         if self.keys:
             self.kidx=0
 
-        #print(f"__iter__ called {self.keys}")
         return self
 
     def __next__(self):
-        #print(f"__next__called {self.kidx}")
         if self.keys and self.kidx < len(self.keys):
             key = self.keys[self.kidx]
             self.kidx += 1
@@ -197,27 +198,3 @@ class SymbolTable:
     @property
     def table(self):
         return self.__table
-
-if __name__ == "__main__":
-    table = SymbolTable()
-    a1 = Array("myarray1", "INTEGER", 10, 20)
-    table[a1.name] = a1
-
-    a2 = Array("myarray2", "INTEGER", 10, 20)
-    table[a2.name] = a2
-
-    if "myarray1" in table:
-        print("myarray1 found")
-    else:
-        print("myarray1 not found")
-
-    if "myarray" in table:
-        print("myarray found")
-    else:
-        print("myarray not found")
-
-    for i in range(10, 20):
-        table[a.name][i] = str(i)
-
-    for i in range(10, 20):
-        print(table[a.name][i])
