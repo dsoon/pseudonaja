@@ -1,4 +1,5 @@
 import pseudonaja.debug as debug
+import pseudonaja.c.ast.literal as literal
 
 class Symbol:
     def __init__(self, name):
@@ -20,8 +21,14 @@ class Variable(Symbol):
         self.__type = type
 
     @property
+    ### NEED TO FIX THIS - When Variable is defined, it is assigned a Literal
     def value(self):
-        return self.__value
+
+        if isinstance(self.__value, literal.Literal):
+            return self.__value.value
+        else:
+            return self.__value
+    ##########################################################################
 
     @value.setter
     def value(self, value):
@@ -40,6 +47,10 @@ class Variable(Symbol):
 
     def __repr__(self):
         return self.__str__()
+
+class Constant(Variable):
+    def __init__(self, name, type, value=None):
+        super().__init__(name, type, value)
 
 class Array(Variable):
     def __init__(self, name, type, s_idx, e_idx):

@@ -28,7 +28,7 @@ class PInterpreter:
         finished = False
         while not finished:
             line = input ("Pseudonaja.c>> ")
-            if line:
+            if line != None:
                 if line[0] == '.':
                     line = line.strip()
                     if len(line) == 1:
@@ -54,13 +54,14 @@ class PInterpreter:
                     prog.append(line)
 
     def run(self, program):
-        try:
-            tokens = self.lexer.tokenize(program)
-            self.parser.parse(tokens)
-            self.parser.root.interpret()
+        #try:
+        
+        tokens = self.lexer.tokenize(program)
+        self.parser.parse(tokens)
+        self.parser.root.interpret()
 
-        except SyntaxError as e:
-            print(f"\nSyntax Error: {e}")
+        #except SyntaxError as e:
+        #    print(f"\nSyntax Error: {e}")
 
         '''
         except UnableToContinue as e:

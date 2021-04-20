@@ -1,7 +1,8 @@
 from . import node
 from . import misc
 import pseudonaja.c.PInterpreter as pcint
-from pseudonaja.c.PSymbolTable import Variable, Array
+from pseudonaja.c.PSymbolTable import Variable, Array, Constant
+from pseudonaja.c.ast.literal import Literal
 
 import pseudonaja.debug as debug
 
@@ -21,7 +22,7 @@ class Assign(node.Node):
         if self.__var.name not in pcint.PInterpreter.symbols:
 
             # check if there is a stackframe
-            if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack, dict):
+            if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):
 
                 if self.__var.name not in pcint.PInterpreter.stack[-1]:
 
@@ -29,6 +30,8 @@ class Assign(node.Node):
 
                 else:
                     onstack = True
+            else:
+                    raise SyntaxError(f"Symbol '{self.__var.name}' undefined on line {self.lineno}")
 
         if isinstance(self.__var, ArrayIdentifier):
 
@@ -44,15 +47,17 @@ class Assign(node.Node):
 
         elif   isinstance(self.__var, Identifier):
             value = self.__expr.interpret()
-
             if not onstack:
                 var_type = pcint.PInterpreter.symbols[self.__var.name].type
+                if not var_type:
+                    raise SyntaxError(f"Cannot re-assign constant '{self.__var.name}'")
+
                 pcint.PInterpreter.symbols[self.__var.name].value = misc.type_cast(var_type, value)
             else:
                 var_type = pcint.PInterpreter.stack[-1][self.__var.name].type
                 pcint.PInterpreter.stack[-1][self.__var.name].value = misc.type_cast(var_type, value)
         else:
-            raise SyntaxError(f"Assign.interpret: ID type undefined {self.__var}")
+            raise SyntaxError(f"Unknown Identifier Type {self.__var}")
 
 
 class Declare(node.Node):
@@ -150,6 +155,10 @@ class IdentifierDecl(node.Node):
     def type(self):
         return self.__type
 
+    @type.setter
+    def type(self, value):
+        self.__type = value
+
     def interpret(self):
         # check if there is a stack frame (declaration called within a blockstatement)
         if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):
@@ -179,7 +188,57 @@ class ArrayIdentifierDecl(IdentifierDecl):
         else: # Add to global symbol table
             pcint.PInterpreter.symbols[__name] = Array(__name, __type, self.__start_idx, self.__end_idx)
 
+class ConstantDecl(IdentifierDecl): 
 
+    def __init__(self, name, value, lineno):
+        super().__init__(name, None, lineno)
 
+        if isinstance(value, Literal):
+            self.__value = value.value
+        else:
+            self.__value = value
 
-        
+    def interpret(self):
+
+        __name = self.name
+
+        if isinstance(self.__value, int):
+            self.type = "INTEGER"
+
+        elif isinstance(self.__value, float):
+            self.type = "REAL"
+
+        elif isinstance(self.__value, str):
+
+            if len(self.__value) == 1:
+                self.type = "CHAR"
+            else:
+                import re, datetime
+
+                isdate = re.match(r'[0-3]?[0-9]/[0-1]?[0-9]/[0-9]{4}', self.__value)
+                if isdate:
+                    dd, mm, yyyy = isdate.group().split("/")
+                    self.__value = datetime.datetime(int(yyyy), int(mm), int(dd))
+                    self.type = "DATE"
+                else:
+                    self.type = "STRING"
+
+        elif isinstance(self.__value, bool):
+            self.type = "BOOLEAN"
+
+        else:
+            raise SyntaxError(f"Invalid constant type '{__name}' = {type(self.__value)}")
+
+        # check if there is a stack frame (declaration called within a blockstatement)
+        if pcint.PInterpreter.stack and len(pcint.PInterpreter.stack) > 0 and isinstance(pcint.PInterpreter.stack[-1], dict):
+            # found a stack frame, add variable to stack frame
+            if __name in pcint.PInterpreter.stack[-1]:
+                raise SyntaxError(f"Constant {__name} already defined, line {self.lineno}")
+            else:
+                pcint.PInterpreter.stack[-1][__name] = Constant(__name, self.type, self.__value)
+
+        else: # Add to global symbol table
+            if __name in pcint.PInterpreter.symbols:
+                raise SyntaxError(f"Constant {__name} already defined, line {self.lineno}")
+            else:
+                pcint.PInterpreter.symbols[__name] = Constant(__name, self.type, self.__value)

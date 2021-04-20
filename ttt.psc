@@ -4,9 +4,11 @@ declare count : integer
 declare player1 : boolean
 declare finished : boolean
 
+constant LENGTH = 9
+
 // Procedure to set-up the game
  procedure setup
-	for i <- 1 to len(ttt)
+	for i <- 1 to LENGTH
 		ttt[i] <- '_'
 	next
 	finished <- false
@@ -31,7 +33,7 @@ endprocedure
 
 // Procedure to print out the board 
 procedure print
-	for i <- 1 to len(ttt) step 3
+	for i <- 1 to LENGTH step 3
 		output ttt[i], ttt[i+1], ttt[i+2]
 	next
 endprocedure

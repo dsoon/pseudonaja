@@ -17,12 +17,19 @@ class BinOp(node.Node):
     def interpret(self):
         from datetime import datetime, timedelta
 
+
         if self.__op.lower() in ['and', 'or'] and (isinstance(self.__left, BinOp) ^ isinstance(self.__right, BinOp)):
             raise TypeError(f"{self.__left} '{self.__op}' '{self.__right}' on line {self.lineno}")
 
-        if not isinstance(self.__left, identifier.Identifier) and isinstance(self.__right, identifier.Identifier) and not isinstance(self.__left, BinOp) and not isinstance(self.__right, BinOp) and self.__left.type != self.__right.type:
+        '''
+        if not isinstance(self.__left, identifier.Identifier) and isinstance(self.__right, identifier.Identifier) and \
+           not isinstance(self.__left, BinOp) and not isinstance(self.__right, BinOp) \
+           and self.__left.type != self.__right.type:
+
             raise TypeError(f"{self.__left.type} {self.__op} {self.__right.type} on line {self.lineno}")
 
+        '''
+        
         n1 = self.__left.interpret()
         n2 = self.__right.interpret()
 

@@ -8,7 +8,7 @@ class PLexer(Lexer):
                     IF, THEN, ELSE, ENDIF, WHILE, DO, ENDWHILE, ASSIGN, OUTPUT, INPUT,
                     DECLARE, TYPE, BOOL, BIGGER, SMALLER, EQUAL, NOTEQUAL, PROCEDURE, ENDPROCEDURE,
                     ARRAY, OF, CALL, FUNCTION, ENDFUNCTION, RETURNS, RETURN, FOR, TO, STEP, NEXT, CASE, ENDCASE,
-                    OTHERWISE,
+                    OTHERWISE, CONSTANT,
                 }
 
     # Any literals we did not define as tokens, will be available for usage in the Parser
@@ -48,7 +48,7 @@ class PLexer(Lexer):
                 'REPEAT', 'UNTIL', 'INPUT', 'DECLARE', 'PROCEDURE', 'ENDPROCEDURE',
                 'ARRAY', 'OF', 'CALL', 'FUNCTION', 'ENDFUNCTION', 'RETURNS',
                 'RETURN', 'FOR', 'TO', 'STEP', 'NEXT', 'CASE', 'ENDCASE',
-                'OTHERWISE']
+                'OTHERWISE', 'CONSTANT']
 
     def IDENTIFIER(self, t):
         if t.value.upper() in self.keywords :

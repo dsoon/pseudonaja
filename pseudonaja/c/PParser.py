@@ -39,169 +39,175 @@ class PParser(Parser):
 
     @_('statement_list')
     def program(self, p):
-        Parser.state = "program : statement_list"
+        PParser.state = "program : statement_list"
         self.root = p[0]
 
     @_('statement')
     def statement_list(self, p):
-        Parser.state = "statement_list : statement"
+        PParser.state = "statement_list : statement"
         return statement_list.StatementList(p[0], None)
 
     @_('statement statement_list')
     def statement_list(self, p):
-        Parser.state = "statement_list : statement statement_list"
+        PParser.state = "statement_list : statement statement_list"
         return statement_list.StatementList(p[0], p[1])
 
     @_('')
     def empty(self, p):
-        Parser.state = "empty : ''"
+        PParser.state = "empty : ''"
         pass
 
     @_('IDENTIFIER ":" TYPE')
     def identifier_type(self, p):
-        Parser.state = "idenifier_type : IDENTIFIER ':' TYPE"
+        PParser.state = "idenifier_type : IDENTIFIER ':' TYPE"
         return identifier.IdentifierDecl(p[0], p[2], p.lineno)
 
     @_('IDENTIFIER ":" ARRAY "[" NUMBER ":"  NUMBER "]" OF TYPE')
     def identifier_type(self, p):
-        Parser.state = "IDENTIFIER : ARRAY [ NUMBER ':' NUMBER ] OF TYPE"
+        PParser.state = "IDENTIFIER : ARRAY [ NUMBER ':' NUMBER ] OF TYPE"
         return identifier.ArrayIdentifierDecl(p[0], p[9], p[4], p[6], p.lineno)
 
     @_('identifier_type')
     def identifier_type_list(self, p):
-        Parser.state = "identifier_type_list : identifier_type"
+        PParser.state = "identifier_type_list : identifier_type"
         return [p[0]]
 
     @_('identifier_type "," identifier_type_list')
     def identifier_type_list(self, p):
-        Parser.state = "identifier_type_list : identifier_type ',' identifier_type_list"
+        PParser.state = "identifier_type_list : identifier_type ',' identifier_type_list"
         return [p[0]] + p[2]
 
     @_('empty')
     def identifier_type_list(self, p):
-        Parser.state = "identifier_type_list : empty"
+        PParser.state = "identifier_type_list : empty"
         pass
 
     # Definitions for statements start here -----------------------------------------------
+
+    @_('CONSTANT IDENTIFIER EQUAL literal')
+    def statement(self, p):
+        PParser.state = "statement : CONSTANT IDENTIFIER = literal"
+        return identifier.ConstantDecl(p[1], p[3], p.lineno)
+
     @_('DECLARE identifier_type')
     def statement(self, p):
-        Parser.state = "statement : DECLARE identifier_type"
+        PParser.state = "statement : DECLARE identifier_type"
         return identifier.Declare(p[1], p.lineno)
 
     # Declaring a procedure with 1 or more arguments
     @_('PROCEDURE IDENTIFIER "(" identifier_type_list ")" statement_list ENDPROCEDURE')
     def statement(self, p):
-        Parser.state = "PROCEDURE IDENTIFIER '(' identifier_type_list ')' statement_list ENDPROCEDURE"
+        PParser.state = "PROCEDURE IDENTIFIER '(' identifier_type_list ')' statement_list ENDPROCEDURE"
         return procedure.ProcedureDecl(p[1], p[3], p[5], p.lineno)
 
     # Declaring a procedure w/o arguments
     @_('PROCEDURE IDENTIFIER statement_list ENDPROCEDURE')
     def statement(self, p):
-        Parser.state = "statement : PROCEDURE IDENTIFIER statement_list ENDPROCEDURE"
+        PParser.state = "statement : PROCEDURE IDENTIFIER statement_list ENDPROCEDURE"
         return procedure.ProcedureDecl(p[1], None, p[2], p.lineno)
 
     # Declaring a function with 1 or more arguments
     @_('FUNCTION IDENTIFIER "(" identifier_type_list ")" RETURNS TYPE statement_list ENDFUNCTION')
     def statement(self, p):
-        Parser.state = "FUNCTION IDENTIFIER '(' identifier_type_list ')' RETURNS TYPE statement_list ENDFUNCTION"
+        PParser.state = "FUNCTION IDENTIFIER '(' identifier_type_list ')' RETURNS TYPE statement_list ENDFUNCTION"
         return function.FunctionDecl(p[1], p[6], p[3], p[7], p.lineno)
 
     # Declaring a function with zero arguments
     @_('FUNCTION IDENTIFIER RETURNS TYPE statement_list ENDFUNCTION')
     def statement(self, p):
-        Parser.state = "statement : FUNCTION IDENTIFIER RETURNS TYPE statement_list ENDFUNCTION"
+        PParser.state = "statement : FUNCTION IDENTIFIER RETURNS TYPE statement_list ENDFUNCTION"
         return function.FunctionDecl(p[1], p[3], None, p[4], p.lineno)
 
     # Declaring a procedure w/o arguments
     @_('CALL IDENTIFIER "(" arg_list ")"')
     def statement(self, p):
-        Parser.state = "statement : CALL IDENTIFIER '(' arg_list ')'"
+        PParser.state = "statement : CALL IDENTIFIER '(' arg_list ')'"
         return procedure.CallProcedure(p[1], p[3], p.lineno)
 
     # Declaring a procedure w/o arguments
     @_('CALL IDENTIFIER')
     def statement(self, p):
-        Parser.state = "statement : CALL IDENTIFIER"
+        PParser.state = "statement : CALL IDENTIFIER"
         return procedure.CallProcedure(p[1], None, p.lineno)
 
     @_('variable ASSIGN expression')
     def statement(self, p):
-        Parser.state = "statement : variable ASSIGN expression"
+        PParser.state = "statement : variable ASSIGN expression"
         return identifier.Assign(p[0], p[2], p.lineno)
 
     @_('INPUT IDENTIFIER')
     def statement(self, p):
-        Parser.state = "statement : INPUT IDENTIFIER"
+        PParser.state = "statement : INPUT IDENTIFIER"
         return io.Input(p[1],p.lineno)
 
     @_('OUTPUT arg_list')
     def statement(self, p):
-        Parser.state = "statement : OUTPUT arg_list"
+        PParser.state = "statement : OUTPUT arg_list"
         return io.Output(p[1], p.lineno)
 
     @_('IF expression THEN statement_list ENDIF')
     def statement(self, p):
-        Parser.state = "statement : IF expression THEN statement_list ENDIF"
+        PParser.state = "statement : IF expression THEN statement_list ENDIF"
         return selection.IfThen(p[1], p[3], p.lineno)
 
     @_('IF expression THEN statement_list ELSE statement_list ENDIF')
     def statement(self, p):
-        Parser.state = "IF expression THEN statement_list ELSE statement_list ENDIF"
+        PParser.state = "IF expression THEN statement_list ELSE statement_list ENDIF"
         return selection.IfThenElse(p[1], p[3], p[5], p.lineno)
 
     @_('CASE OF expression caselist ENDCASE')
     def statement(self, p):
-        Parser.state = "statement : CASE OF expression caselist ENDCASE"
+        PParser.state = "statement : CASE OF expression caselist ENDCASE"
         return selection.Case(p[2], p[3], p.lineno)
 
     @_('a_case')
     def caselist(self, p):
-        Parser.state = "caselist : a_case"
+        PParser.state = "caselist : a_case"
         return [p[0]]
 
     @_('a_case caselist')
     def caselist(self, p):
-        Parser.state = "caselist : a_case caselist"
+        PParser.state = "caselist : a_case caselist"
         return [p[0] ] + p[1]
 
-    @_('constant ":" statement', 'OTHERWISE ":" statement')
+    @_('constant_label ":" statement', 'OTHERWISE ":" statement')
     def a_case(self, p):
-        Parser.state = "a_case : constant ':' statement ' | 'OTHERWISE ':' statement"
+        PParser.state = "a_case : constant_label ':' statement ' | 'OTHERWISE ':' statement"
         return (p[0], p[2])
 
     @_('STRING', 'NUMBER')
-    def constant(self, p):
-        Parser.state = "STRING | NUMBER"
+    def constant_label(self, p):
+        PParser.state = "STRING | NUMBER"
         return p[0]
 
     @_('WHILE expression DO statement_list ENDWHILE')
     def statement(self, p):
-        Parser.state = "WHILE expression DO statement_list ENDWHILE"
+        PParser.state = "WHILE expression DO statement_list ENDWHILE"
         return iteration.While( p[1], p[3], p.lineno)
 
     @_('REPEAT statement_list UNTIL expression')
     def statement(self, p):
-        Parser.state = "REPEAT statement_list UNTIL expression"
+        PParser.state = "REPEAT statement_list UNTIL expression"
         return iteration.Repeat(p[1], p[3], p.lineno)
 
     @_('FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT')
     def statement(self, p):
-        Parser.state = "FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT"
+        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT"
         return iteration.For(p[1], p[3], p[5], None, p[6], p.lineno)
 
     @_('FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT')
     def statement(self, p):
-        Parser.state = "FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT"
+        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT"
         return iteration.For(p[1], p[3], p[5], p[7], p[8], p.lineno)
 
     @_('RETURN expression')
     def statement(self, p):
-        Parser.state = "statement : RETURN expression"
+        PParser.state = "statement : RETURN expression"
         return function.Return(p[1], p.lineno)
 
     @_('"?" IDENTIFIER')
     def statement(self, p):
-        Parser.state = "statement : '?' IDENTIFIER"
+        PParser.state = "statement : '?' IDENTIFIER"
         return misc.QueryCommand(p[1], p.lineno)
 
     # Definitions for statements end here -------------------------------------------------
@@ -210,32 +216,32 @@ class PParser(Parser):
 
     @_('"(" expression ")"')
     def expression(self, p):
-        Parser.state = "expression : '(' expression ')'"
+        PParser.state = "expression : '(' expression ')'"
         return p[1]
  
     @_('expresssion_operation')
     def expression(self, p):
-        Parser.state = "expression : expression_operation"
+        PParser.state = "expression : expression_operation"
         return p[0]
 
     @_('IDENTIFIER "(" arg_list ")"')
     def expression(self, p):
-        Parser.state = "IDENTIFIER '(' arg_list ')'"
+        PParser.state = "IDENTIFIER '(' arg_list ')'"
         return function.CallFunction(p[0], p[2], p.lineno)
 
     @_('IDENTIFIER "(" ")"')
     def expression(self, p):
-        Parser.state = "IDENTIFIER '(' ')'"
+        PParser.state = "IDENTIFIER '(' ')'"
         return function.CallFunction(p[0], None, p.lineno)
 
     @_('expression')
     def arg_list(self, p):
-        Parser.state = "arg_list : expression"
+        PParser.state = "arg_list : expression"
         return misc.ArgList(p[0], None)
 
     @_('expression "," arg_list')
     def arg_list(self, p):
-        Parser.state = "arg_list : expression ',' arg_list"
+        PParser.state = "arg_list : expression ',' arg_list"
         p[2] += misc.ArgList(p[0], None)
         return p[2]
 
@@ -251,59 +257,60 @@ class PParser(Parser):
        'expression OR       expression',
        'expression AND      expression',
        )
+
     def expresssion_operation(self, p):
-        Parser.state = "expression 'operator' expression"
+        PParser.state = "expression 'operator' expression"
         return binop.BinOp(p[0], p[1], p[2], p.lineno)
 
 
     @_('literal') # This must be added to avoid infinite recursion
     def expression(self, p):
-        Parser.state = "expression : literal"
+        PParser.state = "expression : literal"
         return p[0]
 
     @_('"-" NUMBER %prec UMINUS')
     def literal(self, p):
-        Parser.state = "literal : '-' NUMBER"
+        PParser.state = "literal : '-' NUMBER"
         return literal.Literal(int(p[1]) * -1, "NUMBER", p.lineno)
 
     @_('NUMBER')  # Notice how we apply a number of grammar rules to the same method
     def literal(self, p):
-        Parser.state = "literal : NUMBER"
+        PParser.state = "literal : NUMBER"
         return literal.Literal(int(p[0]), "NUMBER", p.lineno)
 
     @_('NUMBER "." NUMBER')
     def literal(self, p):
-        Parser.state = "literal : NUMBER '.' NUMBER"
+        PParser.state = "literal : NUMBER '.' NUMBER"
         return literal.Literal(float(f"{p[0]}.{p[2]}"), "NUMBER", p.lineno)
 
     @_('BOOL')
     def literal(self, p):
-        Parser.state = "literal : BOOL"
+        PParser.state = "literal : BOOL"
         return literal.Literal(True if p[0] == "TRUE" else False, "BOOLEAN", p.lineno)
 
-    @_('STRING')  # Notice how we apply a number of grammar rules to the same method
+    @_('STRING')
     def literal(self, p):
-        Parser.state = "literal : STRING"
+        PParser.state = "literal : STRING"
         return literal.Literal(str(p[0]), "STRING", p.lineno)
 
     @_('IDENTIFIER "[" expression "]"')
     def literal(self, p):
-        Parser.state = "literal : IDENTIFIER '[' expression ']'"
+        PParser.state = "literal : IDENTIFIER '[' expression ']'"
         return identifier.ArrayIdentifier(p[0], p[2], p.lineno)
 
     @_('IDENTIFIER')
     def literal(self, p):
-        Parser.state = "literal : IDENTIFIER"
+        PParser.state = "literal : IDENTIFIER"
         return identifier.Identifier(p[0], p.lineno)
 
     @_('IDENTIFIER "[" expression "]"')
     def variable(self, p):
-        Parser.state = "IDENTIFIER '[' expression ']'"
+        PParser.state = "IDENTIFIER '[' expression ']'"
         return identifier.ArrayIdentifier(p[0], p[2], p.lineno)
 
     @_('IDENTIFIER')
     def variable(self, p):
-        Parser.state = "variable : IDENTIFIER"
+        PParser.state = "variable : IDENTIFIER"
         return identifier.Identifier(p[0], p.lineno)
 
     bin_op = {'+':'+', '-':'-', '*':'*', '/':'/', '>':'>', '>=':'>=', '<':'<',
@@ -311,6 +318,6 @@ class PParser(Parser):
 
     def error(self, p):
         if p:
-            raise SyntaxError(f"Parser error, line {p.lineno}, unexpected token type='{p.type}' value = '{p.value}'\n... while parsing {Parser.state}")
+            raise SyntaxError(f"Syntax error: line {p.lineno}, unexpected token type='{p.type}' value = '{p.value}'")
         else:
             raise SyntaxError("Unexpected end of file detected while parsing program")
