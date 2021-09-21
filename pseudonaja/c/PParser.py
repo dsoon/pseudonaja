@@ -195,13 +195,15 @@ class PParser(Parser):
     @_('FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT IDENTIFIER')
     def statement(self, p):
         PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT IDENTIFIER"
-        if p[1] != p[8]:
-            raise()
+        if p[8] != p[1]:
+            raise NameError(f"NEXT Identifier on line {p.lineno} must be the Identifier assigned in the FOR statement")
         return iteration.For(p[8], p[3], p[5], None, p[6], p.lineno)
 
     @_('FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT IDENTIFIER')
     def statement(self, p):
         PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT IDENTIFIER"
+        if p[10] != p[1]:
+            raise NameError(f"NEXT Identifier on line {p.lineno} must be the Identifier assigned in the FOR statement")
         return iteration.For(p[10], p[3], p[5], p[7], p[8], p.lineno)
 
     @_('RETURN expression')
