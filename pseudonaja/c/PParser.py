@@ -190,15 +190,15 @@ class PParser(Parser):
         PParser.state = "REPEAT statement_list UNTIL expression"
         return iteration.Repeat(p[1], p[3], p.lineno)
 
-    @_('FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT')
+    @_('FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT IDENTIFIER')
     def statement(self, p):
-        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT"
-        return iteration.For(p[1], p[3], p[5], None, p[6], p.lineno)
+        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT IDENTIFIER"
+        return iteration.For(p[8], p[3], p[5], None, p[6], p.lineno)
 
-    @_('FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT')
+    @_('FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT IDENTIFIER')
     def statement(self, p):
-        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT"
-        return iteration.For(p[1], p[3], p[5], p[7], p[8], p.lineno)
+        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT IDENTIFIER"
+        return iteration.For(p[10], p[3], p[5], p[7], p[8], p.lineno)
 
     @_('RETURN expression')
     def statement(self, p):
