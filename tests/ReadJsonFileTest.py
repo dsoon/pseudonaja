@@ -1,7 +1,7 @@
 import json
 
 # read file
-with open("Test1"+".json", 'r') as t:
+with open("tests/Test1"+".json", 'r') as t:
     data = t.read()
 
 # parse file
