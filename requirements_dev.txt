@@ -19,7 +19,7 @@ importlib-metadata==3.10.0
 Jinja2==2.11.3
 jinja2-time==0.2.0
 keyring==23.0.1
-MarkupSafe==1.1.1
+MarkupSafe==2.0.1
 networkx==2.5.1
 packaging==20.9
 pathtools==0.1.2
