@@ -39,7 +39,7 @@ readme-renderer==29.0
 requests==2.24.0
 requests-toolbelt==0.9.1
 rfc3986==1.4.0
-six==1.15.0
+six==1.16.0
 sly==0.4
 snooty==0.8.2.dev0
 snowballstemmer==2.1.0
