@@ -58,6 +58,6 @@ travis==0.0.3
 twine==3.4.1
 typing-extensions==3.7.4.3
 urllib3==1.25.11
-watchdog==0.10.4
+watchdog==2.1.6
 webencodings==0.5.1
 zipp==3.4.1
