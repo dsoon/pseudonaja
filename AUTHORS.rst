@@ -10,4 +10,4 @@ Development Lead
 Contributors
 ------------
 
-* Coding-Cactus
+* Coding-Cactus <CodingCactus.cc@gmail.com>
