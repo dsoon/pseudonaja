@@ -4,7 +4,7 @@ class PLexer(Lexer):
     
     # This is the set of tokens we are exporting to the Parser
     tokens =    {
-                    IDENTIFIER, STRING, NUMBER, OR, AND, REPEAT, UNTIL,
+                    IDENTIFIER, STRING, NUMBER, OR, AND, NOT, REPEAT, UNTIL,
                     IF, THEN, ELSE, ENDIF, WHILE, DO, ENDWHILE, ASSIGN, OUTPUT, INPUT,
                     DECLARE, TYPE, BOOL, BIGGER, SMALLER, EQUAL, NOTEQUAL, PROCEDURE, ENDPROCEDURE,
                     ARRAY, OF, CALL, FUNCTION, ENDFUNCTION, RETURNS, RETURN, FOR, TO, STEP, NEXT, CASE, ENDCASE,
@@ -20,6 +20,7 @@ class PLexer(Lexer):
     # The definition of each token in a regex pattern - Notice that the order MATTERS!! First match will be taken
     OR       = r'OR'
     AND      = r'AND'
+    NOT      = r'NOT'
     ASSIGN   = r'(<-)'
     BOOL     = r'TRUE|FALSE'
     NOTEQUAL = r'<>'
@@ -67,6 +68,9 @@ class PLexer(Lexer):
 
         elif t.value.upper() == 'OR':
             t.type = t.value = 'OR'
+        
+        elif t.value.upper() == 'NOT':
+            t.type = t.value = 'NOT'
 
         elif t.value.upper() == 'OTHERWISE':
             t.type = t.value = 'OTHERWISE'
