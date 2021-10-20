@@ -19,7 +19,7 @@ test_requirements = [ ]
 setup(
     author="David Soon",
     author_email='david.soon@outlook.com',
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -39,6 +39,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/dsoon/pseudonaja',
-    version='0.2.2',
+    version='0.2.5',
     zip_safe=False,
 )
