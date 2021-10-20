@@ -2,6 +2,12 @@
 History
 =======
 
+0.2.5 (01/10/2021)
+------------------
+* Added support for NOT logic operator
+* Added For Loop 'NEXT' label
+* Prevent constants from being re-assigned
+
 0.2.2 (2021-04-20)
 ------------------
 
