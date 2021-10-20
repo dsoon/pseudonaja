@@ -46,12 +46,17 @@ class For(node.Node):
     pcint.PInterpreter.stack.append(stack_frame)
 
     step = 1 if self.__step == None else self.__step.interpret()
-    for i in range(self.__start.interpret(), self.__end.interpret()+1, step):
+    if step > 0:
+        end = self.__end.interpret() + 1
+    else:
+        end = self.__end.interpret() - 1
+    for i in range(self.__start.interpret(), end, step):
 
         stack_frame[self.__identifier].value = i
         
         # Run the procedure
         self.__statements.interpret()
+
 
     # Remove stack frame after procedure is complete
     pcint.PInterpreter.stack.pop() 
