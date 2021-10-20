@@ -57,7 +57,7 @@ tqdm==4.62.3
 travis==0.0.3
 twine==3.4.1
 typing-extensions==3.10.0.2
-urllib3==1.26.7
-watchdog==2.1.6
+urllib3==1.25.11
+watchdog==0.10.4
 webencodings==0.5.1
 zipp==3.6.0
