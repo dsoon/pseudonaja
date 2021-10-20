@@ -48,10 +48,43 @@ class Assign(node.Node):
         elif   isinstance(self.__var, Identifier):
             value = self.__expr.interpret()
             if not onstack:
-                var_type = pcint.PInterpreter.symbols[self.__var.name].type
-                if not var_type:
+                if isinstance(pcint.PInterpreter.symbols[self.__var.name], Constant):
                     raise SyntaxError(f"Cannot re-assign constant '{self.__var.name}'")
 
+
+                # check static typing
+                invalid_type = False
+                var_type = pcint.PInterpreter.symbols[self.__var.name].type                
+                if var_type == "INTEGER":
+                    if not isinstance(value, int) or str(value).upper() in ["TRUE", "FALSE"]: # isinstance(True, int) -> True :/ thanks python
+                        invalid_type = True
+
+                elif var_type == "REAL":
+                    if not isinstance(value, float):
+                        invalid_type = True
+
+                elif var_type == "BOOLEAN":
+                    if not isinstance(value, bool):
+                        invalid_type = True
+
+                # rest are string based
+                elif isinstance(value, str):
+                    if var_type == "CHAR":
+                        if len(value) > 1:
+                            invalid_type = True
+                    
+                    elif var_type == "DATE":
+                        import re
+                        if not re.match(r'[0-3]?[0-9]/[0-1]?[0-9]/[0-9]{4}', value):
+                            invalid_type = True
+                else:
+                    invalid_type = True
+                
+                
+                
+                if invalid_type:
+                    raise ValueError(f"Line {self.lineno} variable '{self.__var.name}' must be of type {var_type}")
+                    
                 pcint.PInterpreter.symbols[self.__var.name].value = misc.type_cast(var_type, value)
             else:
                 var_type = pcint.PInterpreter.stack[-1][self.__var.name].type
