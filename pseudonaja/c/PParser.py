@@ -3,6 +3,7 @@ from pseudonaja.c.ast import identifier as identifier
 from pseudonaja.c.ast import misc as misc
 from pseudonaja.c.ast import literal as literal
 from pseudonaja.c.ast import io as io
+from pseudonaja.c.ast import unop as unop
 from pseudonaja.c.ast import binop as binop
 from pseudonaja.c.ast import statement_list as statement_list
 from pseudonaja.c.ast import selection as selection
@@ -28,6 +29,7 @@ class PParser(Parser):
         ('right', ASSIGN  ),
         ('left',  OR      ),
         ('left',  AND     ),
+        ('right', NOT     ),
         ('left',  EQUAL, NOTEQUAL),
         ('left',  BIGGER, SMALLER),
         ('left',  '+', '-'),
@@ -190,15 +192,19 @@ class PParser(Parser):
         PParser.state = "REPEAT statement_list UNTIL expression"
         return iteration.Repeat(p[1], p[3], p.lineno)
 
-    @_('FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT')
+    @_('FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT IDENTIFIER')
     def statement(self, p):
-        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT"
-        return iteration.For(p[1], p[3], p[5], None, p[6], p.lineno)
+        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression statement_list NEXT IDENTIFIER"
+        if p[8] != p[1]:
+            raise NameError(f"NEXT Identifier on line {p.lineno} must be the Identifier assigned in the FOR statement")
+        return iteration.For(p[8], p[3], p[5], None, p[6], p.lineno)
 
-    @_('FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT')
+    @_('FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT IDENTIFIER')
     def statement(self, p):
-        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT"
-        return iteration.For(p[1], p[3], p[5], p[7], p[8], p.lineno)
+        PParser.state = "FOR IDENTIFIER ASSIGN expression TO expression STEP expression statement_list NEXT IDENTIFIER"
+        if p[10] != p[1]:
+            raise NameError(f"NEXT Identifier on line {p.lineno} must be the Identifier assigned in the FOR statement")
+        return iteration.For(p[10], p[3], p[5], p[7], p[8], p.lineno)
 
     @_('RETURN expression')
     def statement(self, p):
@@ -261,6 +267,14 @@ class PParser(Parser):
     def expresssion_operation(self, p):
         PParser.state = "expression 'operator' expression"
         return binop.BinOp(p[0], p[1], p[2], p.lineno)
+    
+    @_(
+        'NOT expression',
+        )
+    def expresssion_operation(self, p):
+        PParser.state = "'operator' expression"
+        return unop.Unop(p[0], p[1], p.lineno)
+
 
 
     @_('literal') # This must be added to avoid infinite recursion
@@ -315,6 +329,8 @@ class PParser(Parser):
 
     bin_op = {'+':'+', '-':'-', '*':'*', '/':'/', '>':'>', '>=':'>=', '<':'<',
               '<=':'<=', '=':'==', '<>':'!=', 'AND':'and', 'OR':'or'}
+    
+    un_op = {'NOT':'not'}
 
     def error(self, p):
         if p:
